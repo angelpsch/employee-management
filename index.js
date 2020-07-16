@@ -77,6 +77,8 @@ switch (choice) {
 
 async function viewAll() {
     const employees = await db.findEmployees();
+    console.log('\n');
+    console.table(employees); 
     promptLoad(); 
 }
 async function viewByDept(){
@@ -94,6 +96,8 @@ async function viewByDept(){
         }
     ]);
     const employees = await db.findEmployeesByDept(deptId);
+    console.log('\n');
+    console.table(employees);
     promptLoad(); 
 }; 
 
@@ -139,5 +143,28 @@ async function updateRole(){
     const roleChoice = roles.map(({id, name}) => ({
         name: name,
         value: id
-    }))
+    }));
+    const {roleId} = await prompt ([
+        {
+            type:'list',
+            name: 'roleId',
+            message: 'Please select the role you would like to assign.',
+            choices: roleChoice
+        }
+    ]);
+    await db.updateRole(employeeId, roleId); 
+    console.log('Successfully updated.');
+    promptLoad(); 
+}
+
+async function viewRoles() {
+    const roles = await db.findRoles();
+    console.log('\n');
+    console.table(roles);
+    promptLoad(); 
+}
+
+async function removeRole(){
+    const roles = await db.findRoles();
+    const roleChoice = roles.map(({id, title}))
 }
