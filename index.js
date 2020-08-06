@@ -4,6 +4,29 @@ const db = require('./db');
 
 promptLoad(); 
 
+switch (choice) {
+    case 'VIEW_EMPLOYEES':
+        return viewAll();
+    case 'VIEW_BY_DEPT':
+        return viewByDept(); 
+    case 'ADD_E':
+        return addEmployee();
+    case 'REMOVE_E':
+        return removeEmployee(); 
+    case 'VIEW_ALL_ROLES':
+        return viewRoles();
+    case 'VIEW_DEPTS':
+        return viewDepts(); 
+    case 'ADD_DEPT':
+        return addDept();
+    case 'ADD_ROLE':
+        return addRole();
+    case 'UPDATE_ROLE':
+        return updateRole(); 
+    default:
+        return quit(); 
+}
+
 async function promptLoad() {
     const {choice} = await prompt([
         {
@@ -52,28 +75,7 @@ async function promptLoad() {
     ])
 }; 
 
-switch (choice) {
-    case 'VIEW_EMPLOYEES':
-        return viewAll();
-    case 'VIEW_BY_DEPT':
-        return viewByDept(); 
-    case 'ADD_E':
-        return addEmployee();
-    case 'REMOVE_E':
-        return removeEmployee(); 
-    case 'VIEW_ALL_ROLES':
-        return viewRoles();
-    case 'VIEW_DEPTS':
-        return viewDepts(); 
-    case 'ADD_DEPT':
-        return addDept();
-    case 'ADD_ROLE':
-        return addRole();
-    case 'UPDATE_ROLE':
-        return updateRole(); 
-    default:
-        return quit(); 
-}
+
 
 async function viewAll() {
     const employees = await db.findEmployees();
@@ -82,7 +84,7 @@ async function viewAll() {
     promptLoad(); 
 }
 async function viewByDept(){
-    const depts = await db.findDepartments(); 
+    const depts = await db.findDepts(); 
     const deptChoice = depts.map(({id,name}) => ({
         name: name,
         value: id
@@ -102,7 +104,7 @@ async function viewByDept(){
 }; 
 
 async function addRole(){
-    const depts = await db.findDepartments();
+    const depts = await db.findDepts();
     const deptChoice = depts.map(({id,name}) => ({
         name: name, 
         value: id
@@ -164,7 +166,68 @@ async function viewRoles() {
     promptLoad(); 
 }
 
-async function removeRole(){
-    const roles = await db.findRoles();
-    const roleChoice = roles.map(({id, title}))
+async function addDept() {
+    const dept = await prompt([
+      {
+        name: "name",
+        message: "What is the name of the department?"
+      }
+    ]);
+  
+    await db.createDept(dept);
+  
+    console.log(`Added ${dept.name} to the database`)
+    loadMainPrompts();
+  }
+
+
+  async function viewDepts() {
+    const depts = await db.findAllDepartments();
+  
+    console.log("\n");
+    console.table(depts);
+  
+    loadMainPrompts();
+  }
+
+  async function addEmployee() {
+    const roles = await db.findAllRoles();
+    const employees = await db.findAllEmployees();
+  
+    const employee = await prompt([
+      {
+        name: "first_name",
+        message: "Please enter the first name of your employee"
+      },
+      {
+        name: "last_name",
+        message: "Pleae enter the last name of your employee"
+      }
+    ]);
+  
+    const roleChoices = roles.map(({ id, title }) => ({
+      name: title,
+      value: id
+    }));
+  
+    const { roleId } = await prompt({
+      type: "list",
+      name: "roleId",
+      message: "Please enter employee's role",
+      choices: roleChoices
+    });
+  
+    employee.role_id = roleId;
+await db.createEmployee(employee);
+
+console.log(
+    `Successfully added ${employee.first_name} ${employee.last_name} to the database`
+  );
+
+  loadMainPrompts();
+}
+
+function quit() {
+  console.log("Goodbye!");
+  process.exit();
 }
