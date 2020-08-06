@@ -7,7 +7,6 @@ CREATE TABLE employee (
     first_name VARCHAR(50),
     last_name VARCHAR(50), 
     role_id INT NOT NULL, 
-    manager_id INT 
 );
 
 CREATE TABLE departments (
@@ -18,7 +17,6 @@ CREATE TABLE departments (
 CREATE TABLE roles (
     id INT NOT NULL AUTO_INCREMENT primary key,
     title VARCHAR(100) NOT NULL UNIQUE,
-    salary DECIMAL(10,2) NULL,
     department_id INT NOT NULL
 );
 
